@@ -1,28 +1,57 @@
-#define NOTE_C2 428
-#define NOTE_Db2 454
-#define NOTE_D2 481
-#define NOTE_Eb2 509
-#define NOTE_E2 540
-#define NOTE_F2 572
-#define NOTE_Gb2 606
-#define NOTE_G2 642
-#define NOTE_Ab2 680
-#define NOTE_A3 720
-#define NOTE_Bb3 763
-#define NOTE_B3 809
-#define NOTE_C3 857
-#define NOTE_Db3 908
-#define NOTE_D3 962
-#define NOTE_Eb3 1019
-#define NOTE_E3 1080
-#define NOTE_F3 1144
-#define NOTE_Gb3 1212
-#define NOTE_G3 1284
-#define NOTE_Ab3 1360
-#define NOTE_A4 1441
-#define NOTE_Bb4 1527
-#define NOTE_B4 1618
-#define NOTE_C4 1714
+#define FREQ_C2  130.8127826502992
+#define FREQ_Db2 138.59131548843592
+#define FREQ_D2  146.83238395870364
+#define FREQ_Eb2 155.56349186104035
+#define FREQ_E2  164.81377845643485
+#define FREQ_F2  174.61411571650183
+#define FREQ_Gb2 184.9972113558171
+#define FREQ_G2  195.99771799087452
+#define FREQ_Ab2 207.65234878997245
+#define FREQ_A3  219.9999999999999
+#define FREQ_Bb3 233.08188075904488
+#define FREQ_B3  246.94165062806198
+#define FREQ_C3  261.6255653005985
+#define FREQ_Db3 277.182630976872
+#define FREQ_D3  293.66476791740746
+#define FREQ_Eb3 311.1269837220808
+#define FREQ_E3  329.62755691286986
+#define FREQ_F3  349.2282314330038
+#define FREQ_Gb3 369.99442271163434
+#define FREQ_G3  391.99543598174927
+#define FREQ_Ab3 415.3046975799451
+#define FREQ_A4  440.0
+#define FREQ_Bb4 466.1637615180899
+#define FREQ_B4  493.8833012561241
+#define FREQ_C4  523.2511306011974
+
+#define SAMPLE_RATE 10000.0
+
+
+//#define NOTE_C2 428
+//#define NOTE_Db2 454
+//#define NOTE_D2 481
+//#define NOTE_Eb2 509
+//#define NOTE_E2 540
+//#define NOTE_F2 572
+//#define NOTE_Gb2 606
+//#define NOTE_G2 642
+//#define NOTE_Ab2 680
+//#define NOTE_A3 720
+//#define NOTE_Bb3 763
+//#define NOTE_B3 809
+//#define NOTE_C3 857
+//#define NOTE_Db3 908
+//#define NOTE_D3 962
+//#define NOTE_Eb3 1019
+//#define NOTE_E3 1080
+//#define NOTE_F3 1144
+//#define NOTE_Gb3 1212
+//#define NOTE_G3 1284
+//#define NOTE_Ab3 1360
+//#define NOTE_A4 1441
+//#define NOTE_Bb4 1527
+//#define NOTE_B4 1618
+//#define NOTE_C4 1714
 
 const unsigned char sine[] = {
     129, 135, 141, 147, 153, 160, 166, 172, 177, 183, 189, 194, 200, 205, 210, 214,
@@ -33,16 +62,23 @@ const unsigned char sine[] = {
      38,  34,  30,  26,  22,  19,  16,  13,  10,   8,   6,   4,   3,   2,   1,   1,
       1,   1,   1,   2,   3,   4,   6,   8,  10,  13,  16,  19,  22,  26,  30,  34,
      38,  43,  47,  52,  57,  63,  68,  74,  80,  85,  91,  97, 104, 110, 116, 122
-
 };
 
+const unsigned int sine_len = sizeof(sine) / sizeof(sine[0]);
 
-unsigned int phaseA;
-unsigned int phaseB;
+#define SINE_SAMPLES 128
+//#define SINE_SAMPLES sizeof(sine)
+//  (sizeof(sine) / sizeof(sine[0]))
+#define PHASE_TO_SAMPLE_OFFSET_SHIFT 9
+#if (SINE_SAMPLES << PHASE_TO_SAMPLE_OFFSET_SHIFT) != 65536L
+    #error PHASE_TO_SAMPLE_OFFSET_SHIFT and SINE_SAMPLES don not agree! 
+#endif
+
+#define PHASE_PER_TIC_FOR_FREQ(freq) ((unsigned int)(65536.0 * freq / SAMPLE_RATE))
 
 volatile unsigned char outA;
 volatile unsigned char outB;
-volatile int do_next_sample;
+volatile bool do_next_sample;
 
 void MyISR() {
     OCR1A = outA;
@@ -52,8 +88,6 @@ void MyISR() {
 
 void setup() {
   // put your setup code here, to run once:
-  phaseA = 0;
-  phaseB = 0;
   do_next_sample = false;
   
   // First...
@@ -118,14 +152,38 @@ void setup() {
   attachInterrupt(0, MyISR, FALLING);
 }
 
+inline unsigned char sineAtPhase(unsigned int phase) {
+  // Performs linear interpolation when phase is between samples.
+  // It's not phase correct, but who cares?
+  // e.g. if phase were 8-bit, with 4 bits of sample:
+  // phase 0b 0000 00xx => use sample 0b0000
+  // phase 0b 0000 01xx => use sample 0b0000
+  // phase 0b 0000 10xx => use half of sample 0b0000 and half of 0b0001
+  // phase 0b 0000 11xx => use half of sample 0b0000 and half of 0b0001
+  // phase 0b 0001 00xx => use sample 0b0001
+  // etc
+  unsigned char offset = phase >> 9;
+  if (phase & 0x0100) {
+    return sine[offset] >> 1 + sine[(offset + 1) & 0x7F] >> 1;
+  } else {
+    return sine[offset];
+  }
+}
 
 void loop() {
-  while (!do_next_sample);
-  phaseA += NOTE_C2;
-  phaseB += NOTE_G3;
-  outA = sine[phaseA >> 9];
-  outB = sine[phaseB >> 9];
-  do_next_sample = false;
+  unsigned int phaseA = 0;
+  unsigned int phaseB = 0;
+  while (true) {
+    while (!do_next_sample);
+
+    phaseA += PHASE_PER_TIC_FOR_FREQ(FREQ_C2);
+    outA = sineAtPhase(phaseA);
+
+    phaseB += PHASE_PER_TIC_FOR_FREQ(FREQ_G3);
+    outB = sineAtPhase(phaseB);
+
+    do_next_sample = false;
+  }
 }
 
 

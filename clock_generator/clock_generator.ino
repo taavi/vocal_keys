@@ -27,7 +27,7 @@ void setup() {
   // OCR1A = PWM data!
   // OCR1B = PWM data!
   // OCR1C = Period
-  OCR1C = 199; // @ 2MHz that means 9986Hz is the PWM frequency
+  OCR1C = 199; // @ 2MHz that means about 10kHz PWM frequency
   OCR1A = 100; // 50% duty
 
   // TIMSK = RES : OCIE1A : OCIE1B : OCIE0A : OCIE0B : TOIE1 : TOIE0 : RES

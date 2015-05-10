@@ -26,9 +26,9 @@ void setup() {
   // TCNT1 = the counter
   // OCR1A = PWM data!
   // OCR1B = PWM data!
-  // OCR1C = 255
-  OCR1C = 110; // @ 2MHz that means 9986Hz is the PWM frequency
-  OCR1A = 55; // 50% duty
+  // OCR1C = Period
+  OCR1C = 199; // @ 2MHz that means 9986Hz is the PWM frequency
+  OCR1A = 100; // 50% duty
 
   // TIMSK = RES : OCIE1A : OCIE1B : OCIE0A : OCIE0B : TOIE1 : TOIE0 : RES
   // 0CIE1[AB]: Interrupt enable = 0

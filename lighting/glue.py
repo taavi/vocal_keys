@@ -19,12 +19,12 @@ class LinearDisplay(object):
         if key >= (len(self._state) * 8):
             return
         digit, bit = divmod(key, 8)
-        mask = 1 << BIT_TRANSLATOR[bit]
+        mask = 1 << self.BIT_TRANSLATOR[bit]
         if do_set:
             self._state[digit] |= mask
         else:
             self._state[digit] &= ~(mask)
-        self._spi_7221.write(nums2str(DIG0 + digit, self._state[digit]))
+        self._spi_7221.write(fake7221.nums2str(fake7221.DIG0 + digit, self._state[digit]))
 
 
 display = LinearDisplay(spi)
@@ -45,4 +45,5 @@ midi.open_port(name="Some Name")
 midi.set_callback(callback)
 
 while True:
-    sleep(1)
+    time.sleep(1)
+    spi.write(fake7221.nums2str(fake7221.SHUTDOWN, 1))

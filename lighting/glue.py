@@ -1,4 +1,5 @@
 DEBUG_SPI = False
+DEBUG_7221 = False
 
 import base64
 import time
@@ -64,7 +65,8 @@ MIDI_C4 = 72
 def callback(event, data):
     ((event_type, note, velocity), time_delta) = event
     display[note - MIDI_C2] = True if event_type == KEYDOWN else False
-    print spi
+    if DEBUG_7221:
+        print spi
 
 
 midi = rtmidi.MidiIn()
@@ -76,3 +78,5 @@ while True:
     if DEBUG_SPI:
         print base64.b16encode(data)
     spi.write(data)
+    if DEBUG_7221:
+        print spi

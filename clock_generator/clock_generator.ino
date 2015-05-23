@@ -57,6 +57,18 @@ void setup() {
   DDRB = 0x02;
 }
 
+int i = 0;
+
 void loop() {
   // Nothing to do here. Just let Timer/Counter1 do its work.
+  if (i == 0) {
+    int tuner_value;
+    tuner_value = analogRead(A3);
+    OCR1C = (tuner_value / 25) + 180;
+  }
+  i++;
+  nop;
+  nop;
+  nop;
+  nop;
 }

@@ -78,8 +78,16 @@ def callback(event, data):
 
 
 midi = rtmidi.MidiIn()
-port_names = midi.get_ports()
-best_port = filter(lambda x: "Midi Through" not in x, port_names)[0]
+best_port = None
+while True:
+    port_names = midi.get_ports()
+    non_through_ports = filter(lambda x: "Midi Through" not in x, port_names)
+    if non_through_ports:
+        best_port = non_through_ports[0]
+    else:
+        print "No MIDI device found yet, only saw", port_names
+        time.sleep(1)
+
 midi.open_port(name=best_port)
 midi.set_callback(callback)
 

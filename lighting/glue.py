@@ -4,6 +4,7 @@ DEBUG_SPI = False
 DEBUG_7221 = False
 
 import base64
+import fcntl
 import time
 import threading
 
@@ -11,7 +12,32 @@ import rtmidi
 import fake7221
 import mq
 
-spi = fake7221.Fake7221()
+SPI_IOC_WR_MODE = 0x40016b01
+SPI_IOC_RD_MODE = 0x80016b01
+SPI_IOC_WR_BITS_PER_WORD = 0x40016b03
+SPI_IOC_RD_BITS_PER_WORD = 0x80016b03
+SPI_IOC_WR_MAX_SPEED_HZ = 0x40046b04
+SPI_IOC_RD_MAX_SPEED_HZ = 0x80046b04
+
+
+USE_FAKE_SPI = false
+if USE_FAKE_SPI:
+    spi = fake7221.Fake7221()
+else:
+    spi = open('/dev/spidev0.0')
+    for opt, arg in [
+        (SPI_IOC_WR_MODE, 0),
+        (SPI_IOC_RD_MODE, 0),
+        (SPI_IOC_WR_BITS_PER_WORD, 8),
+        (SPI_IOC_RD_BITS_PER_WORD, 8),
+        (SPI_IOC_WR_MAX_SPEED_HZ, 200000),
+        (SPI_IOC_RD_MAX_SPEED_HZ, 200000),
+    ]:
+        ret = fcntl.ioctl(spi.fileno(), opt, arg)
+        if ret == -1:
+            print "Failed to set opt", opt, "to", arg
+            time.sleep(1)
+            return 1
 
 q = mq.MQ()
 
@@ -93,10 +119,12 @@ while best_port is None:
 midi.open_port(best_port)
 midi.set_callback(callback)
 
+
 while True:
     data = q.read()
     if DEBUG_SPI:
         print base64.b16encode(data)
     spi.write(data)
+    spi.flush()
     if DEBUG_7221:
         print spi

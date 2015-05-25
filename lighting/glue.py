@@ -87,7 +87,7 @@ while best_port is None:
             print "Found", i, port_name
             break
     else:
-        print "No MIDI device found yet, only saw", port_names
+        print "No MIDI device found yet, only saw", ports
         time.sleep(1)
 
 midi.open_port(best_port)

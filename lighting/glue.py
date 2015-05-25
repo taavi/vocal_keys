@@ -84,12 +84,13 @@ while best_port is not None:
     for i, port_name in ports:
         if "Midi Through" not in port_name:
             best_port = i
+            print "Found", i, port_name
             break
     else:
         print "No MIDI device found yet, only saw", port_names
         time.sleep(1)
 
-midi.open_port(name=best_port)
+midi.open_port(best_port)
 midi.set_callback(callback)
 
 while True:

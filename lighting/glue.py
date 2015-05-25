@@ -78,7 +78,9 @@ def callback(event, data):
 
 
 midi = rtmidi.MidiIn()
-midi.open_port(name="Some Name")
+port_names = midi.get_ports()
+best_port = filter(lambda x: "Midi Through" not in x, port_names)[0]
+midi.open_port(name=best_port)
 midi.set_callback(callback)
 
 while True:

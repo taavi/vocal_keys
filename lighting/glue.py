@@ -79,7 +79,7 @@ def callback(event, data):
 
 midi = rtmidi.MidiIn()
 best_port = None
-while True:
+while not best_port:
     port_names = midi.get_ports()
     non_through_ports = filter(lambda x: "Midi Through" not in x, port_names)
     if non_through_ports:

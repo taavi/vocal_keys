@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 DEBUG_SPI = False
 DEBUG_7221 = False
 

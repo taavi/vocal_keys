@@ -163,9 +163,10 @@ inline unsigned char sineAtPhase(unsigned int phase) {
   // phase 0b 0001 00xx => use sample 0b0001
   // etc
   unsigned char offset = phase >> 9;
-  if (phase & 0x0100) {
-    return sine[offset] >> 1 + sine[(offset + 1) & 0x7F] >> 1;
-  } else {
+//  if (phase & 0x0100) {
+//    return sine[offset] >> 1 + sine[(offset + 1) & 0x7F] >> 1;
+//  } else
+  {
     return sine[offset];
   }
 }
@@ -174,7 +175,10 @@ void loop() {
   unsigned int phaseA = 0;
   unsigned int phaseB = 0;
   while (true) {
-    while (!do_next_sample);
+    while (!do_next_sample) {
+      __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+      __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+    }
 
     phaseA += PHASE_PER_TIC_FOR_FREQ(FREQ_C2);
     outA = sineAtPhase(phaseA);

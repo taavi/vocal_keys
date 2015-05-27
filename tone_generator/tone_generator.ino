@@ -7,9 +7,9 @@
 #define FREQ_Gb2 184.9972113558171
 #define FREQ_G2  195.99771799087452
 #define FREQ_Ab2 207.65234878997245
-#define FREQ_A3  219.9999999999999
-#define FREQ_Bb3 233.08188075904488
-#define FREQ_B3  246.94165062806198
+#define FREQ_A2  219.9999999999999
+#define FREQ_Bb2 233.08188075904488
+#define FREQ_B2  246.94165062806198
 #define FREQ_C3  261.6255653005985
 #define FREQ_Db3 277.182630976872
 #define FREQ_D3  293.66476791740746
@@ -19,9 +19,9 @@
 #define FREQ_Gb3 369.99442271163434
 #define FREQ_G3  391.99543598174927
 #define FREQ_Ab3 415.3046975799451
-#define FREQ_A4  440.0
-#define FREQ_Bb4 466.1637615180899
-#define FREQ_B4  493.8833012561241
+#define FREQ_A3  440.0
+#define FREQ_Bb3 466.1637615180899
+#define FREQ_B3  493.8833012561241
 #define FREQ_C4  523.2511306011974
 
 #define SAMPLE_RATE 10000.0
@@ -180,10 +180,10 @@ void loop() {
       __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t");
     }
 
-    phaseA += PHASE_PER_TIC_FOR_FREQ(FREQ_C2);
+    phaseA += PHASE_PER_TIC_FOR_FREQ(FREQ_B3);
     outA = sineAtPhase(phaseA);
 
-    phaseB += PHASE_PER_TIC_FOR_FREQ(FREQ_G3);
+    phaseB += PHASE_PER_TIC_FOR_FREQ(FREQ_C4);
     outB = sineAtPhase(phaseB);
 
     do_next_sample = false;

@@ -5,8 +5,8 @@ Quick Start
 -----------
 
 1. Plug power wires into the Raspberry Pi ![wiring diagram](RasPiWiring.png)
-1. Plug visual driver wires into the Raspberry Pi
-1. Plug 2x3 connector onto visual driver
+1. Plug visual driver wires into the Raspberry Pi ![RasPi Header Photograph](RasPiHeader.jpg)
+1. Plug 2x3 connector onto visual driver ![Visual Driver Header Photograh](VisualHeader.jpg)
 1. Connect the 7 light cables into J1-J7
 1. Connect the blue clock driver cable with 8P8C connector into the middle sound driver
 1. Use the two 8P8C patch cables to connect the left and right sound drivers to the pink sockets

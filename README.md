@@ -4,7 +4,7 @@ Vocal Keys
 Quick Start
 -----------
 
-1. Plug power wires into the Raspberry Pi ([see diagram](RasPiWiring.svg)).
+1. Plug power wires into the Raspberry Pi ![wiring diagram](RasPiWiring.png)
 1. Plug visual driver wires into the Raspberry Pi
 1. Plug 2x3 connector onto visual driver
 1. Connect the 7 light cables into J1-J7
@@ -64,7 +64,13 @@ The ATtinys come with no bootloader, so you have to program them with a
 programmer. Thankfully almost any Arduino will do! I used my Arduino Leonardo.
 
 * http://www.arduino.cc/en/Tutorial/ArduinoISP
-* https://petervanhoyweghen.wordpress.com/2012/09/16/arduinoisp-on-the-leonardo/
-* http://kevincuzner.com/2013/05/27/raspberry-pi-as-an-avr-programmer/
+* https://petervanhoyweghen.wordpress.com/2012/09/16/arduinoisp-on-the-leonardo/ steps 1, 2, 4, 6 (more or less)
 
-(I think these are the best links, offline just now)
+For more details about how to program ATtinys with this:
+
+* http://blog.roguecode.co.za/make-dirt-cheap-electronics-with-attiny45-arduino-nano/
+
+When you put a fresh ATtiny in, do `Tools | Burn Bootloader`, which will
+reprogram the fuses. We want the 8MHz internal clock. I don't _think_ that it
+actually burns an Arduino bootloader (it doesn't make any sense on an ATtiny,
+since there's no UART).
